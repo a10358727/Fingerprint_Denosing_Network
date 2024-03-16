@@ -1,0 +1,7 @@
+python==3.8.13
+pytorch==1.12.1-py3.8_cuda11.3_cudnn8_0
+numpy
+tqdm
+glob
+opencv
+skimage.metrics
