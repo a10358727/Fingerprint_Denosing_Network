@@ -101,7 +101,7 @@ class GenNoise(nn.Module):
         noise = self.body(x)
         noise_w = self.gen_noise_w(noise)
         noise_b = self.gen_noise_b(noise)       
-          
+        
         m_w = torch.mean(torch.mean(noise_w,-1),-1).unsqueeze(-1).unsqueeze(-1)
         noise_w = noise_w-m_w      
         m_b = torch.mean(torch.mean(noise_b,-1),-1).unsqueeze(-1).unsqueeze(-1)
@@ -125,9 +125,7 @@ class MLDN_model(nn.Module):
         
         cleans = []
         for i in range(level.shape[0]):
-            # print(x[i,:,:,:].shape)
-            # print(y[i,:,:,:].shape)
-            
+
             if level[i] == 0:
                 clean = self.genclean1(x[i,:,:,:].unsqueeze(0),y[i,:,:,:].unsqueeze(0))
             elif level[i] == 1:
@@ -144,6 +142,6 @@ class MLDN_model(nn.Module):
         cleans = torch.stack(cleans)
         cleans = cleans.squeeze(1)
         # print(cleans.shape)
-        noise_w, noise_b = self.gen_noise(x-cleans)
+        noise_w, noise_b = self.gen_noise(x - cleans)
         
         return noise_w, noise_b, cleans

@@ -13,6 +13,8 @@ mse = nn.MSELoss(reduction='mean')
 
 
 
+
+
 def save_image(opt,index,noise_output,clean_output,level):
     
     result_folder = './results/' + opt.name + '/test/'
@@ -31,7 +33,6 @@ def save_image(opt,index,noise_output,clean_output,level):
         os.makedirs(result_folder + '3/')
     if not os.path.exists(result_folder + '4/'):
         os.makedirs(result_folder + '4/')
-    print(result_folder + str(level.item()) + '/noise_' + str(index) + '.bmp')
     img = _save_image(opt,noise_output)
     cv2.imwrite(result_folder + str(level.item()) + '/noise_' + str(index) + '.bmp', img.astype(np.uint8))
     img = _save_image(opt,clean_output)

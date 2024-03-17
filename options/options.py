@@ -24,6 +24,8 @@ class Options():
 
         # model parameters
         
+        
+        
         parser.add_argument('--input_nc', type=int, default=1, help='# of input image channels: 3 for RGB and 1 for grayscale')
         parser.add_argument('--output_nc', type=int, default=1, help='# of output image channels: 3 for RGB and 1 for grayscale')
         parser.add_argument('--input_w', type=int, default=36, help='# of input image width')
