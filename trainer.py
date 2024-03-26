@@ -12,27 +12,13 @@ from torch.backends import cudnn
 mse = nn.MSELoss(reduction='mean') 
 
 
-
-
-
 def save_image(opt,index,noise_output,clean_output,level):
-    
-    result_folder = './results/' + opt.name + '/test/'
-    if not os.path.exists(result_folder):
-        os.makedirs(result_folder)
-    result_folder += opt.model_name + '/'
-    if not os.path.exists(result_folder):
-        os.makedirs(result_folder)
-    if not os.path.exists(result_folder + '0/'):
-        os.makedirs(result_folder + '0/')
-    if not os.path.exists(result_folder + '1/'):
-        os.makedirs(result_folder + '1/')
-    if not os.path.exists(result_folder + '2/'):
-        os.makedirs(result_folder + '2/')
-    if not os.path.exists(result_folder + '3/'):
-        os.makedirs(result_folder + '3/')
-    if not os.path.exists(result_folder + '4/'):
-        os.makedirs(result_folder + '4/')
+    # create path 
+    result_folder = './results/' + opt.name + '/test/' + opt.model_name + '/'
+    for i in range(5):
+        folder_path = result_folder + str(i) + '/'
+        os.makedirs(folder_path, exist_ok=True)
+
     img = _save_image(opt,noise_output)
     cv2.imwrite(result_folder + str(level.item()) + '/noise_' + str(index) + '.bmp', img.astype(np.uint8))
     img = _save_image(opt,clean_output)
@@ -45,12 +31,17 @@ def _save_image(opt,img):
     img = img  * 255.0
     img = img.astype('uint8')
     return img 
-    
 
 def train(opt,model,device,train_dataloader,val_dataloader):
     epoch_num = opt.epochs
     optimizer = torch.optim.Adam(model.parameters(), lr=opt.lr, betas=(0.9, 0.999), eps=1e-08, weight_decay=1e-09, amsgrad=True)
-    for epoch in (range(1,epoch_num+1)):
+    
+    if opt.Continue :
+        epochs = int(opt.model_name) + 1
+    else:
+        epochs = 1
+    
+    for epoch in (range( epochs,epochs + epoch_num)):
         
         model.train()
         loss_train = 0.0
@@ -62,7 +53,7 @@ def train(opt,model,device,train_dataloader,val_dataloader):
             noise_data = noise_data.numpy()
             clear_data = clear_data.numpy()
             level = level.numpy()
-            
+            # print(level)
             # print(noise_data.shape)
             # print(clear_data.shape)
             # print(level.shape)

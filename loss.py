@@ -52,6 +52,7 @@ def loss_aug(clean, clean1, noise_w, noise_w1, noise_b, noise_b1):
     loss = loss1 + loss2 + loss3
     return loss
 
+# get sift
 def test(src, model,opt=0):
     
     img1 = (src*255.0).astype('uint8')
@@ -139,18 +140,21 @@ def loss_main(input_noisy, input_noisy_pred, clean, clean1, clean2, clean3, nois
 
 def mes_loss(clean,input_clear,level):
     loss = 0
+    
     for i in range(level.shape[0]):
         loss_rec = mse(clean[i],input_clear[i])
         if level[i] == 0:
-            loss += loss_rec * 1.25
+            loss += loss_rec * 1.5
         elif level[i] == 1:
-            loss += loss_rec * 1.15
+            loss += loss_rec * 1.25
         elif level[i] == 2:
             loss += loss_rec * 0.9
         elif level[i] == 3:
             loss += loss_rec * 0.7
         elif level[i] == 4:
             loss += loss_rec * 0.5
+        
+        
     
     return loss / level.shape[0]
 

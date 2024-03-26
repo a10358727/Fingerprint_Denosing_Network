@@ -72,8 +72,9 @@ def load_test_path(opt):
 def _image_paths_search(image_dirs):
         file_patterns = ['*.bmp', '*.png', '*.jpg', '*.jpeg']
         image_list = []
-        
-        image_list = [file for pattern in file_patterns for file in glob.glob(os.path.join(image_dirs, '**', pattern), recursive=True)]
+        for image_dir in image_dirs:
+            temp_list = [file for pattern in file_patterns for file in glob.glob(os.path.join(image_dir, '**', pattern), recursive=True)]
+            image_list.extend(temp_list)
 
         print(len(image_list))
         return image_list
@@ -86,6 +87,7 @@ class TestDataset(Dataset):
         super().__init__()
         self.noise_paths = noise
         self.clean_paths = clean
+        
         self.input_h = opt.input_h
         self.input_w = opt.input_w
     

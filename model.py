@@ -2,6 +2,8 @@ import torch.nn.functional as F
 import torch.nn as nn
 import torch
 import numpy as np
+from torchsummary import summary
+
 class AddCoords(nn.Module):
     def __init__(self, x_dim=64, y_dim=64, with_r=False, skiptile=False):
         super(AddCoords, self).__init__()
@@ -96,7 +98,7 @@ class GenNoise(nn.Module):
             if isinstance(m, nn.Conv2d):
                 nn.init.xavier_uniform_(m.weight)
                 nn.init.constant_(m.bias, 0)
-      
+    
     def forward(self, x, weights=None, test=False):
         noise = self.body(x)
         noise_w = self.gen_noise_w(noise)
@@ -143,5 +145,22 @@ class MLDN_model(nn.Module):
         cleans = cleans.squeeze(1)
         # print(cleans.shape)
         noise_w, noise_b = self.gen_noise(x - cleans)
+        # cleans_stacked = torch.stack(cleans, dim=0)  # 堆叠多个 clean 张量
+        # # print(x.shape)
+        # # print(cleans_stacked.shape)
+        # noise_w, noise_b = self.gen_noise(x - cleans_stacked)
         
         return noise_w, noise_b, cleans
+
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+    
+if __name__ == '__main__':
+
+    # 创建模型实例
+    model = MLDN_model()
+
+    # 统计模型参数数量
+    num_params = count_parameters(model)
+    print("模型参数数量:", num_params)
