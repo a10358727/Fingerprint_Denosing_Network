@@ -8,6 +8,7 @@ from model import MLDN_model
 from loss import loss_aug, loss_main,ssim,psnr,generate_sift,match_loss,mes_loss
 from data import dataloader
 from torch.backends import cudnn
+from sklearn.preprocessing import MinMaxScaler
 
 mse = nn.MSELoss(reduction='mean') 
 
@@ -20,16 +21,17 @@ def save_image(opt,index,noise_output,clean_output,level):
         os.makedirs(folder_path, exist_ok=True)
 
     img = _save_image(opt,noise_output)
-    cv2.imwrite(result_folder + str(level.item()) + '/noise_' + str(index) + '.bmp', img.astype(np.uint8))
+    cv2.imwrite(result_folder + str(level.item()) + '/' + str(index) + '_noise.bmp', img.astype(np.uint8))
     img = _save_image(opt,clean_output)
-    cv2.imwrite(result_folder + str(level.item()) + '/clean_' + str(index) + '.bmp', img.astype(np.uint8))
+    cv2.imwrite(result_folder + str(level.item()) + '/' + str(index) + '_clean.bmp', img.astype(np.uint8))
 
 def _save_image(opt,img):
+    scaler = MinMaxScaler()
     img = img.cpu().detach().numpy()
     img = img[:,:]
-    img = img.reshape(opt.output_h,opt.output_w)
-    img = img  * 255.0
-    img = img.astype('uint8')
+    img = img.reshape(opt.output_h ,opt.output_w )
+    img = scaler.fit_transform(img)
+    img = (img  * 255.0).astype('uint8')
     return img 
 
 def train(opt,model,device,train_dataloader,val_dataloader):
@@ -90,8 +92,10 @@ def train(opt,model,device,train_dataloader,val_dataloader):
     
             loss_match  = match_loss(clean,input_clear,input_noisy)
             loss_rec = mes_loss(clean,input_clear,level)
-            loss = loss_main(input_noisy, input_noisy_pred, clean, clean1, clean2, clean3, noise_b, noise_b1, noise_b2, noise_b3, noise_w, noise_w1, noise_w2)
-
+            loss = loss_main(input_noisy, input_noisy_pred, clean, clean1, 
+                             clean2, clean3, noise_b, noise_b1, noise_b2, 
+                             noise_b3, noise_w, noise_w1, noise_w2)
+            loss_total = loss + loss_rec  + loss_match   
             #stage3
             #loss_aug1 = loss_aug(clean, clean4, noise_w, noise_w4, noise_b, -noise_b4)
             #loss_aug2 = loss_aug(clean, clean5, noise_w, -noise_w5, noise_b, noise_b5)
@@ -104,7 +108,7 @@ def train(opt,model,device,train_dataloader,val_dataloader):
             #     loss_total = loss + loss_rec * 1.25 + loss_match
             #stage3
             #loss_total = loss + 0.1(loss_aug1+loss_aug2+loss_aug3+loss_aug4)+ loss_rec * 0.5 + loss_match
-            loss_total = loss + loss_rec  + loss_match            
+                     
             loss_total.backward()
             optimizer.step()
             loss_train += loss_total.item()

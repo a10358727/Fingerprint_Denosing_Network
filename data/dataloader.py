@@ -101,11 +101,15 @@ class TestDataset(Dataset):
         
         image = Image.open(noise_path).convert("L")
         image = np.array(image)
-        image = image.reshape([1,self.input_h,self.input_w]) / 255.0
+        # 裁剪圖像
+        # image = image[3:-3, 3:-3]
+        # # 重新調整形狀並進行正規化
+        image = image.reshape([1, self.input_h , self.input_w ]) / 255.0
         
         label = Image.open(clean_path).convert("L")
         label = np.array(label)
-        label = label.reshape([1,self.input_h,self.input_w]) / 255.0
+        # label = label[3:-3, 3:-3]
+        label = label.reshape([1,self.input_h  ,self.input_w ]) / 255.0
         
         level = noise_path.split('/')[-2]   # get the level 
         level = int(level)

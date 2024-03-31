@@ -153,8 +153,5 @@ def mes_loss(clean,input_clear,level):
             loss += loss_rec * 0.7
         elif level[i] == 4:
             loss += loss_rec * 0.5
-        
-        
-    
-    return loss / level.shape[0]
 
+    return loss / level.shape[0]
